@@ -18,14 +18,15 @@ namespace Mafren
         private static TraceWriter _log;
 
         [FunctionName("Mafren")]
-        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, 
+            TraceWriter log, 
+            ExecutionContext context)
         {
             _log = log;
             _log.Info("running...");
-            log.Info(Environment.CurrentDirectory);
-            
+
             _config = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
+                .SetBasePath(context.FunctionAppDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
