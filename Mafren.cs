@@ -23,8 +23,6 @@ namespace Mafren
             ExecutionContext context)
         {
             _log = log;
-            _log.Info("running...");
-
             _config = new ConfigurationBuilder()
                 .SetBasePath(context.FunctionAppDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
@@ -46,7 +44,7 @@ namespace Mafren
             var result = await httpClient.PostAsync("http://www.hauts-de-seine.gouv.fr/booking/create/4462/1", data);
             var htmlPage = await result.Content.ReadAsStringAsync();
 
-            if (!htmlPage.Contains("xl n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
+            if (!htmlPage.Contains("Il n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
             {
                 log.Warning("Booking AVAILABLE");
                 await SendEmail();
@@ -57,7 +55,6 @@ namespace Mafren
         {
             var client = new SendGridClient(_config["SendGridKey"]);
             var from = new EmailAddress(_config["From"]);
-            _log.Info(from.Email);
             var subject = "NATIONALITE - Vite - prends rdv maintenant!";
             var plainTextContent = "http://www.hauts-de-seine.gouv.fr/booking/create/4462";
             var htmlContent = "<a href=\"http://www.hauts-de-seine.gouv.fr/booking/create/4462\">Clique ici</a>";
