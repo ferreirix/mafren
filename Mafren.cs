@@ -22,6 +22,8 @@ namespace Mafren
         {
             _log = log;
             _log.Info("running...");
+            log.Info(Environment.CurrentDirectory);
+            
             _config = new ConfigurationBuilder()
                 .SetBasePath(Environment.CurrentDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
