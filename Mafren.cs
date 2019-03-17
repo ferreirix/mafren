@@ -15,11 +15,13 @@ namespace Mafren
     public static class Mafren
     {
         private static IConfigurationRoot _config;
+        private static TraceWriter _log;
 
         [FunctionName("Mafren")]
         public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
-            log.Info("running...");
+            _log = log;
+            _log.Info("running...");
             _config = new ConfigurationBuilder()
                 .SetBasePath(Environment.CurrentDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
@@ -52,19 +54,29 @@ namespace Mafren
         {
             var client = new SendGridClient(_config["SendGridKey"]);
             var from = new EmailAddress(_config["From"]);
+            _log.Info(from.Email);
             var subject = "NATIONALITE - Vite - prends rdv maintenant!";
             var plainTextContent = "http://www.hauts-de-seine.gouv.fr/booking/create/4462";
             var htmlContent = "<a href=\"http://www.hauts-de-seine.gouv.fr/booking/create/4462\">Clique ici</a>";
 
-            var toEmails = _config.GetSection("To")
-                                .GetChildren()
-                                .Select(x => x.Value);
-
-            foreach (var email in toEmails)
+            try
             {
-                var to = new EmailAddress(email);
-                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                await client.SendEmailAsync(msg);
+                var toEmails = _config.GetSection("To")
+                                    .GetChildren()
+                                    .Select(x => x.Value);
+
+                foreach (var email in toEmails)
+                {
+                    _log.Info(email);
+                    var to = new EmailAddress(email);
+                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                    await client.SendEmailAsync(msg);
+                }
+            }
+            catch (System.Exception e)
+            {
+                _log.Error(e.ToString(), e);
+                throw;
             }
         }
 
