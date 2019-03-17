@@ -18,8 +18,8 @@ namespace Mafren
         private static TraceWriter _log;
 
         [FunctionName("Mafren")]
-        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, 
-            TraceWriter log, 
+        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer,
+            TraceWriter log,
             ExecutionContext context)
         {
             _log = log;
@@ -59,24 +59,16 @@ namespace Mafren
             var plainTextContent = "http://www.hauts-de-seine.gouv.fr/booking/create/4462";
             var htmlContent = "<a href=\"http://www.hauts-de-seine.gouv.fr/booking/create/4462\">Clique ici</a>";
 
-            try
-            {
-                var toEmails = _config.GetSection("To")
-                                    .GetChildren()
-                                    .Select(x => x.Value);
+            var toEmails = _config.GetSection("To")
+                                .GetChildren()
+                                .Select(x => x.Value);
 
-                foreach (var email in toEmails)
-                {
-                    _log.Info(email);
-                    var to = new EmailAddress(email);
-                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                    await client.SendEmailAsync(msg);
-                }
-            }
-            catch (System.Exception e)
+            foreach (var email in toEmails)
             {
-                _log.Error(e.ToString(), e);
-                throw;
+                _log.Info(email);
+                var to = new EmailAddress(email);
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                await client.SendEmailAsync(msg);
             }
         }
 
