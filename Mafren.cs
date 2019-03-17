@@ -41,7 +41,7 @@ namespace Mafren
             var result = await httpClient.PostAsync("http://www.hauts-de-seine.gouv.fr/booking/create/4462/1", data);
             var htmlPage = await result.Content.ReadAsStringAsync();
 
-            if (!htmlPage.Contains("Il n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
+            if (!htmlPage.Contains("l n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
             {
                 log.Warning("Booking AVAILABLE");
                 await SendEmail();
