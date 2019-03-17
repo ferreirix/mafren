@@ -42,7 +42,9 @@ namespace Mafren
             });
 
             var result = await httpClient.PostAsync("http://www.hauts-de-seine.gouv.fr/booking/create/4462/1", data);
+            _log.Info(result.StatusCode.ToString());
             var htmlPage = await result.Content.ReadAsStringAsync();
+            _log.Info(htmlPage);
 
             if (!htmlPage.Contains("Il n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
             {
