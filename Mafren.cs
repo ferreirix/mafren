@@ -18,7 +18,7 @@ namespace Mafren
         private static TraceWriter _log;
 
         [FunctionName("Mafren")]
-        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer,
+        public static async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer,
             TraceWriter log,
             ExecutionContext context)
         {
@@ -43,13 +43,15 @@ namespace Mafren
 
             var result = await httpClient.PostAsync("http://www.hauts-de-seine.gouv.fr/booking/create/4462/1", data);
             _log.Info(result.StatusCode.ToString());
-            var htmlPage = await result.Content.ReadAsStringAsync();
-            _log.Info(htmlPage);
-
-            if (!htmlPage.Contains("Il n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
+            if (result.IsSuccessStatusCode)
             {
-                log.Warning("Booking AVAILABLE");
-                await SendEmail();
+                var htmlPage = await result.Content.ReadAsStringAsync();
+
+                if (!htmlPage.Contains("Il n'existe plus de plage horaire libre pour votre demande de rendez-vous."))
+                {
+                    log.Warning("Booking AVAILABLE");
+                    await SendEmail();
+                }
             }
         }
 
