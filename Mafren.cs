@@ -18,7 +18,7 @@ namespace Mafren
         private static TraceWriter _log;
 
         [FunctionName("Mafren")]
-        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer,
+        public static async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer,
             TraceWriter log,
             ExecutionContext context)
         {
